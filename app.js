@@ -4,8 +4,10 @@ let { body, validationResult } = require('express-validator');
 
 let db = require('./database');
 let Task = require('./models');
-db.sync({force: true }).then(() => 'DB initted...');
+db.sync({force: false }).then(() => 'DB initted...');
 
+
+app.use(express.urlencoded({ extended: false }))
 
 app.set('view engine', 'pug');
 //uncomment when there are static files
@@ -17,9 +19,6 @@ app.get('/', async (req, res) => { //is for getting all tasks
     let tasks = null
     try {
         tasks = await Task.findAll()
-
-        console.log("TASKS")
-        console.log(tasks)
         
         //let id = req.query.id != undefined ? req.query.id : undefined 
         //let deleted = req.query.deleted == 'true' ? true : false
@@ -32,11 +31,26 @@ app.get('/', async (req, res) => { //is for getting all tasks
 })
 
 
-app.get('/retrieve', async (req, res) => {
+app.get('/retrieve', async (req, res) => { //for getting task with query param
+    task_id = req.query.id
+    let task = null
+    try {
+        task = await Task.findByPk(task_id)
+        res.render('retrieve', { task: task })
+
+    } catch {
+        task = []
+        res.render('retrieve', { task: task })
+    }
+})
+
+app.get('/retrieve/:id', async (req, res) => { //for getting task with id
     task_id = req.params.id
     let task = null
     try {
         task = await Task.findByPk(task_id)
+        res.render('retrieve', { task: task })
+
     } catch {
         task = []
         res.render('retrieve', { task: task })
@@ -56,7 +70,6 @@ app.post('/create-task', async (req, res) => {
     //body('complete_time').isAfter(Date.now())
 
     let task = await Task.create(form)
-
     res.redirect(`/retrieve/?id=${ task.id }`)
 })
 

@@ -12,9 +12,8 @@ let Task = db.define('Task', {
     },
     comment: {
         type: DataTypes.STRING,
-        allowNull:true
     },
-    complete_time: { //when should user complete the task
+    time: { //when should user complete the task
         type: DataTypes.TIME
     },
     done: {

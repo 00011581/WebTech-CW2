@@ -4,15 +4,9 @@ block content
 
     p.intro-text List of all the To-Do tasks
 
-    p.tasks #{tasks}
-
-    p.end-text This is ending
-
     if (tasks.length)
         ul
             each task in tasks
-                li= task.title
-                li= task.comment
-                li= task.complete_time
+                a(href='/retrieve/' + task.id)= task.title
     else 
         p Doesnt exist
