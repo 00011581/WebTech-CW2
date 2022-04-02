@@ -1,0 +1,10 @@
+extends layout.pug
+
+block content
+    p Fill the form to create a new task
+        form(action="/create-task", method="POST")
+            textarea.input(name="title")
+            textarea.input(name="comment" cols="30" rows="10")
+            input(type='time')
+
+            button.btn Create Task

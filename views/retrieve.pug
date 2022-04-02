@@ -1,0 +1,12 @@
+extends layout.pug
+
+block content 
+    p.intro-text Individual task
+
+    if (task)
+        p= task.title 
+        p= task.comment
+        p= task.complete_time
+        
+    else 
+        p Doesnt exist
