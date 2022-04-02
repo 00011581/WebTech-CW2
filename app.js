@@ -15,14 +15,11 @@ app.set('view engine', 'pug');
 //app.use("/tasks", tasks);
 
 
+//get all tasks
 app.get('/', async (req, res) => { //is for getting all tasks
     let tasks = null
     try {
         tasks = await Task.findAll()
-        
-        //let id = req.query.id != undefined ? req.query.id : undefined 
-        //let deleted = req.query.deleted == 'true' ? true : false
-        //let updated = req.query.updated == 'true' ? true : false
         res.render('index', { tasks: tasks })
     } catch {
         tasks = []
@@ -31,19 +28,7 @@ app.get('/', async (req, res) => { //is for getting all tasks
 })
 
 
-app.get('/retrieve', async (req, res) => { //for getting task with query param
-    task_id = req.query.id
-    let task = null
-    try {
-        task = await Task.findByPk(task_id)
-        res.render('retrieve', { task: task })
-
-    } catch {
-        task = []
-        res.render('retrieve', { task: task })
-    }
-})
-
+//retrieve task using id
 app.get('/retrieve/:id', async (req, res) => { //for getting task with id
     task_id = req.params.id
     let task = null
@@ -57,20 +42,75 @@ app.get('/retrieve/:id', async (req, res) => { //for getting task with id
     }
 })
 
-
-app.get('/new-task', async (req, res) => {
+//form for creating a new task
+app.get('/new', async (req, res) => {
     res.render('create')
 })
 
 
-app.post('/create-task', async (req, res) => {
-    let form = req.body
+//creating a new task
+app.post('/create', [
+    //form validation
+    body('title', "Title field should not be empty and less than 3 characters")
+        .exists()
+        .isLength({ min: 3 })
+], async (req, res) => {
     
-    //body('title').isLength({ min:1 })
-    //body('complete_time').isAfter(Date.now())
+    let errors = validationResult(req)
+    
+    if (!errors.isEmpty()){
+        return res.status(400).jsonp(errors.array())
+    }
 
+    let form = req.body
     let task = await Task.create(form)
-    res.redirect(`/retrieve/?id=${ task.id }`)
+    res.redirect('/')
+})
+
+
+//deleting the task
+app.get('/delete/:id', async (req, res) => {
+    let id = req.params.id
+    let result = await Task.destroy({
+        where: {
+            id: id
+        }
+    })
+    res.redirect('/')
+})
+
+
+//form for updating the task
+app.get('/update-task/:id', async (req, res) => {
+    let id = req.params.id
+    res.render('update', { id: id })
+})
+
+
+//updating the task
+app.post('/update/:id', [
+    //form validation
+    body('title', "Title field should not be empty and less than 3 characters")
+        .exists()
+        .isLength({ min: 3 }),
+],  async (req, res) => {
+    
+    let id = req.params.id
+    let form = req.body
+    //if form.done is yes; it's true
+    //if form.done is no; it's false
+
+    let updated_task = await Task.update({
+        title: form.title,
+        comment: form.comment,
+        time: form.time,
+        done: form.done,
+    }, {
+        where: {
+            id: id
+        }
+    })
+    res.redirect(`/retrieve/${id}`)
 })
 
 

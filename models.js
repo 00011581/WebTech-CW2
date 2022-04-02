@@ -19,10 +19,6 @@ let Task = db.define('Task', {
     done: {
         type: DataTypes.BOOLEAN,
         defaultValue: false //means default is not "done"
-    },
-    undone: {
-        type: DataTypes.BOOLEAN, 
-        defaultValue: true //means default is undone
     }
 }, {
     tableName: 'tasks'

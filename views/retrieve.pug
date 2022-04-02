@@ -9,7 +9,12 @@ block content
         li= task.comment
         li= task.time
         li= task.done
-        li= task.undone
 
     else 
         p Doesnt exist
+    
+    form(action="/delete/" + task.id, method="DELETE")
+        button.btn Delete Task
+
+    form(action=`/update-task/${task.id}`)
+        button.btn Update Task
