@@ -7,6 +7,9 @@ let Task = require('./models');
 db.sync({force: false }).then(() => 'DB initted...');
 
 
+PORT = 3000
+
+
 app.use(express.urlencoded({ extended: false }))
 
 app.set('view engine', 'pug');
@@ -15,14 +18,27 @@ app.set('view engine', 'pug');
 //app.use("/tasks", tasks);
 
 
-//get all tasks
+//get all tasks or get done or get undone tasks
 app.get('/', async (req, res) => { //is for getting all tasks
-    let tasks = null
-    try {
+    done = req.query.done;
+    
+    if (req.query.done){
+        done = req.query.done;
+        //because done is coming as a string
+        var bool_done = (done == 'true')
+
+        let done_tasks = Task.findAll({
+            where: {
+                done: bool_done
+            }
+        }).then(function (list) {
+            //rendering
+            res.render('index', { tasks: list })
+        })
+    }
+    else {
+        let tasks = null
         tasks = await Task.findAll()
-        res.render('index', { tasks: tasks })
-    } catch {
-        tasks = []
         res.render('index', { tasks: tasks })
     }
 })
@@ -90,31 +106,47 @@ app.get('/update-task/:id', async (req, res) => {
 //updating the task
 app.post('/update/:id', [
     //form validation
-    body('title', "Title field should not be empty and less than 3 characters")
+    body('title')
         .exists()
-        .isLength({ min: 3 }),
+        .isLength({ min: 3 })
+        .withMessage("Title field should not be empty and less than 3 characters"),
 ],  async (req, res) => {
+    
+    let errors = validationResult(req)
+    if (!errors.isEmpty()){
+        return res.status(400).jsonp(errors.array())
+    }
     
     let id = req.params.id
     let form = req.body
-    //if form.done is yes; it's true
-    //if form.done is no; it's false
+    
+    if (form.done == 'on') {
+       form.done = true
+    }
+    else {
+        form.done = false
+    }
 
-    let updated_task = await Task.update({
-        title: form.title,
-        comment: form.comment,
-        time: form.time,
-        done: form.done,
-    }, {
-        where: {
-            id: id
-        }
-    })
-    res.redirect(`/retrieve/${id}`)
+    try{
+        let updated_task = await Task.update({
+            title: form.title,
+            comment: form.comment,
+            time: form.time,
+            done: form.done,
+        }, {
+            where: { 
+                id: id
+            }
+        })
+        res.redirect(`/retrieve/${id}`)
+    }
+    catch (error){
+        return res.status(400).jsonp(error)
+    }
 })
 
 
-app.listen(3000, (err) => {
+app.listen(PORT, (err) => {
     if (err) console.log(err)
     console.log('Server is running on port 3000 ...')
 })
