@@ -7,5 +7,7 @@ block content
         input(type="text" name="title")
         input(type="text" name="comment" cols="30" rows="10")
         input(type="time" name="time")
-
         button.btn Create Task
+
+        if empty_title_error 
+            p.titleError #{ empty_title_error }

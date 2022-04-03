@@ -38,8 +38,14 @@ app.get('/', async (req, res) => { //is for getting all tasks
     }
     else {
         let tasks = null
-        tasks = await Task.findAll()
-        res.render('index', { tasks: tasks })
+        try{
+            tasks = await Task.findAll()
+            res.render('index', { tasks: tasks })
+        }
+        catch {
+            tasks = []
+            res.render('index', { tasks: tasks })
+        }
     }
 })
 
@@ -58,6 +64,7 @@ app.get('/retrieve/:id', async (req, res) => { //for getting task with id
     }
 })
 
+
 //form for creating a new task
 app.get('/new', async (req, res) => {
     res.render('create')
@@ -67,20 +74,25 @@ app.get('/new', async (req, res) => {
 //creating a new task
 app.post('/create', [
     //form validation
-    body('title', "Title field should not be empty and less than 3 characters")
-        .exists()
-        .isLength({ min: 3 })
+    body('title').exists().isLength({ min: 3 })
+        .withMessage("Title field should not be empty and less than 3 characters")
 ], async (req, res) => {
     
-    let errors = validationResult(req)
+    let empty_title_error = null
+    let all_errors = validationResult(req)
     
-    if (!errors.isEmpty()){
-        return res.status(400).jsonp(errors.array())
+    if (!all_errors.isEmpty()){
+        const errors = all_errors.array()
+        for (error of errors){
+            empty_title_error = error.msg
+        }
+        res.render('create', { empty_title_error : empty_title_error})
     }
-
-    let form = req.body
-    let task = await Task.create(form)
-    res.redirect('/')
+    else {
+        let form = req.body
+        let task = await Task.create(form)
+        res.redirect('/')
+    }
 })
 
 
@@ -112,36 +124,39 @@ app.post('/update/:id', [
         .withMessage("Title field should not be empty and less than 3 characters"),
 ],  async (req, res) => {
     
-    let errors = validationResult(req)
-    if (!errors.isEmpty()){
-        return res.status(400).jsonp(errors.array())
-    }
-    
-    let id = req.params.id
-    let form = req.body
-    
-    if (form.done == 'on') {
-       form.done = true
+    let all_errors = validationResult(req)
+    if (!all_errors.isEmpty()){
+        const errors = all_errors.array()
+        for (error of errors){
+            empty_title_error = error.msg
+        }
+        res.render('update', { empty_title_error : empty_title_error})
     }
     else {
-        form.done = false
-    }
+        //as checkbox returns 'on/off', resetting to true/false
+        if (req.body.done == 'on') {
+            req.body.done = true
+        }
+        else {
+            req.body.done = false
+        }
 
-    try{
-        let updated_task = await Task.update({
-            title: form.title,
-            comment: form.comment,
-            time: form.time,
-            done: form.done,
-        }, {
-            where: { 
-                id: id
-            }
-        })
-        res.redirect(`/retrieve/${id}`)
-    }
-    catch (error){
-        return res.status(400).jsonp(error)
+        try{
+            let updated_task = await Task.update({
+                title: req.body.title,
+                comment: req.body.comment,
+                time: req.body.time,
+                done: req.body.done,
+            }, {
+                where: { 
+                    id: req.params.id
+                }
+            })
+            res.redirect(`/retrieve/${req.params.id}`)
+        }
+        catch (error){
+            return res.status(400).jsonp(error)
+        }
     }
 })
 
