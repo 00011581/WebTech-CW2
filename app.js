@@ -189,5 +189,5 @@ app.post('/update/:id', [
 
 app.listen(PORT, (err) => {
     if (err) console.log(err)
-    console.log('Server is running on port 3000 ...')
+    console.log(`Server is running on port ${PORT} ...`)
 })

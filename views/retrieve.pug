@@ -1,20 +1,29 @@
 extends layout.pug
 
 block content 
-    p.intro-text Individual task
+    .card.w-25
+        .card-header.h4 Individual task
+        .card-body
+            if (task)
+                li.card-title 
+                    span.h6 Title: 
+                    span #{ task.title }
+                li.card-text 
+                    span.h6 Comment:
+                    span  #{ task.comment }
+                li.card-text 
+                    span.h6 Time: 
+                    span #{ task.time } 
+                li.card-text 
+                    span.h6 Done: 
+                    if task.done 
+                        input(type="checkbox" checked)
+                    else
+                        input(type="checkbox")
 
-    if (task)
-        li= task.id
-        li= task.title
-        li= task.comment
-        li= task.time
-        li= task.done
+            else 
+                p Doesnt 
+        .card-footer.d-flex.justify-content-center
+                a.btn.btn-success(href=`/update-task/${task.id}` style="margin-right: 0.5rem") Update
+                a.btn.btn-danger(href=`/delete/${ task.id }`) Delete
 
-    else 
-        p Doesnt exist
-    
-    form(action="/delete/" + task.id, method="DELETE")
-        button.btn Delete Task
-
-    form(action=`/update-task/${task.id}`)
-        button.btn Update Task
