@@ -75,22 +75,32 @@ app.get('/new', async (req, res) => {
 app.post('/create', [
     //form validation
     body('title').exists().isLength({ min: 3 })
-        .withMessage("Title field should not be empty and less than 3 characters")
+        .withMessage("Title field should not be empty and less than 3 characters"),
+    body('time').not().isEmpty()
+        .withMessage("Time field should not be empty")
 ], async (req, res) => {
-    
+
     let empty_title_error = null
+    let empty_time_error = null
     let all_errors = validationResult(req)
     
     if (!all_errors.isEmpty()){
         const errors = all_errors.array()
         for (error of errors){
-            empty_title_error = error.msg
+            if (error.param == 'title'){
+                empty_time_error = error.msg
+            }
+            else {
+                empty_time_error = error.msg
+            }
         }
-        res.render('create', { empty_title_error : empty_title_error})
+        res.render('create', { 
+            empty_title_error : empty_title_error,
+            empty_time_error : empty_time_error
+        })
     }
     else {
-        let form = req.body
-        let task = await Task.create(form)
+        let task = await Task.create(req.body)
         res.redirect('/')
     }
 })
@@ -111,7 +121,8 @@ app.get('/delete/:id', async (req, res) => {
 //form for updating the task
 app.get('/update-task/:id', async (req, res) => {
     let id = req.params.id
-    res.render('update', { id: id })
+    let task = await Task.findByPk(id)
+    res.render('update', { task:task })
 })
 
 
@@ -122,15 +133,30 @@ app.post('/update/:id', [
         .exists()
         .isLength({ min: 3 })
         .withMessage("Title field should not be empty and less than 3 characters"),
+    body('time').not().isEmpty()
+        .withMessage("Time field should not be empty")
 ],  async (req, res) => {
-    
+
     let all_errors = validationResult(req)
     if (!all_errors.isEmpty()){
+        let empty_title_error = null
+        let empty_time_error = null
+        task = await Task.findByPk(req.params.id)
+        
         const errors = all_errors.array()
         for (error of errors){
-            empty_title_error = error.msg
+            if (error.param == 'title'){
+                empty_time_error = error.msg
+            }
+            else {
+                empty_time_error = error.msg
+            }
         }
-        res.render('update', { empty_title_error : empty_title_error})
+        res.render('update', {
+            task: task,
+            empty_title_error : empty_title_error,
+            empty_time_error : empty_time_error
+        })
     }
     else {
         //as checkbox returns 'on/off', resetting to true/false

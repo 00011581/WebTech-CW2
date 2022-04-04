@@ -3,13 +3,18 @@ extends layout.pug
 block content
     p Fill the form to update the task
 
-    form(action=`/update/${id}`, method="POST")
-        input(type="text" name="title")
-        input(type="text" name="comment" cols="30" rows="10")
-        input(type="time" name="time")
-        input(type="checkbox", name="done")
+    form(action=`/update/${task.id}`, method="POST")
+        input(type="text" name="title" value= task.title)
+        input(type="text" name="comment" value= task.comment cols="30" rows="10")
+        input(type="time" name="time" value= task.time)
+        if task.done
+            input(type="checkbox", name="done" checked)
+        else
+            input(type="checkbox", name="done")
         button.btn Update Task
         
         if empty_title_error 
             p.titleError #{ empty_title_error }
-        
+
+        if empty_time_error
+            p.timeError #{ empty_time_error }
