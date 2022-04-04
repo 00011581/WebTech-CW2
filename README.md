@@ -6,7 +6,7 @@ The project is created for managing to-do tasks. Available features are performi
 
 ### Technologies used
 
-Express JS has been used for back-end of this project, and SQLite3 as a database. Technologies of front-end are HTML, CSS, and JavaScript.
+Express JS has been used for back-end of this project, and SQLite3 as a database. Technologies of front-end are HTML and Bootstrap.
 # Project Installation
 To clone source code to local machine
 ```
@@ -14,7 +14,7 @@ git clone https://github.com/00011581/WebTech-CW2.git
 ```
 To install dependency packages
 ```
-npm init
+npm install express express-validator pug sqlite3 sequelize
 ```
 To run app in local machine
 ```

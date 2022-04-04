@@ -1,56 +1,58 @@
-//const express = require('express');
-//const { getTasks } = require('../businessFunctions');
-// let router = express.Router();
+const express = require('express');
+let db = require('../database');
+let Task = require('../models');
+let router = express.Router();
 
-// const database = '../data.json'
-
-// router
-//   .route("/create")
-//   .post((req, res) => {
-//       let form = req.body
-//       if (form.issue.trim().length <= 0) {
-//         res.redirect('/?received=no')
-//       } else {
-//         let data = getTasks(database)
-        
-//         let task = {
-//             id: uid(),
-//             name: form.name,
-//             status: "undone",
-//             comment: form.comment,
-//             created_date: form.date
-//         }
-        
-//         data.push(task)
-        
-//         fs.writeFileSync('data.json', JSON.stringify(data))
-//         res.redirect(`/?received=yes&ticket=${task.id}`)
-//     }
-// })
+db.sync({force: false }).then(() => 'DB initted...');
 
 
-// router
-//   .route("/:taskid")
-//   .get((req, res) =>{
-//     let id = req.params.id;
-//     //let task = 
-//     //TODO: implement further by getting data based on
-//     //id from data.json file
-// })
+//getting certain task based on task id
+router
+    .route("/retrieve/:id")
+    .get( async (req, res) => {
+    task_id = req.params.id
+    let task = null
+    //using try/catch to prevent unfriendly errors
+    try {
+        task = await Task.findByPk(task_id)
+        res.render('retrieve', { task: task })
+    } catch {
+        task = []
+        res.render('retrieve', { task: task })
+    }
+})
 
 
-// router
-//   .route("/:taskid/update")
-//   .put((req, res) =>{
-//     //update task
-//   })
+router
+    //form for creating new task
+    .route("/new")
+    .get( async (req, res) => {
+        res.render('create')
+})
 
-// module.exports = router;
+
+router
+    //deleting the task based on 'id' in url
+    .route("/delete/:id")
+    .get(async (req, res) => {
+        let id = req.params.id
+        let result = await Task.destroy({
+            where: {
+                id: id
+            }
+        })
+        res.redirect('/')
+    })
 
 
-// router
-//   .route("/:taskid/delete")
-//   .delete((req, res) => {
-//       //delete task
-//   })
+router
+    //form for updating the task    
+    .route("/update-task/:id")
+    .get(async (req, res) => {
+        let id = req.params.id
+        let task = await Task.findByPk(id)
+        res.render('update', { task:task })
+})
 
+
+module.exports = router;

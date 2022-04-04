@@ -7,7 +7,7 @@ block content
                 li.list-group-item.list-group-item-action.active.h2 All To-Do tasks
                 each task in tasks
                     li.list-group-item.list-group-item-action
-                        a.text-dark.text-decoration-none.font-weight-light(href='/retrieve/' + task.id)= task.title
+                        a.text-dark.text-decoration-none.font-weight-light(href='tasks/retrieve/' + task.id)= task.title
         else 
             p.alert.alert-warning No tasks available 
-            a.btn.btn-success(href="/new") Create New Task
+            a.btn.btn-success(href="tasks/new") Create New Task
