@@ -5,7 +5,7 @@ let db = require('./database');
 let Task = require('./models');
 let tasks = require('./routes/tasks');
 
-PORT = 3000
+PORT = process.env.PORT || 3000
 
 db.sync({force: false }).then(() => 'DB initted...');
 
