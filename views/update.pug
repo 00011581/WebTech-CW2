@@ -1,20 +1,23 @@
 extends layout.pug
 
 block content
-    p Fill the form to update the task
-
     form(action=`/update/${task.id}`, method="POST")
-        input(type="text" name="title" value= task.title)
-        input(type="text" name="comment" value= task.comment cols="30" rows="10")
-        input(type="time" name="time" value= task.time)
-        if task.done
-            input(type="checkbox", name="done" checked)
-        else
-            input(type="checkbox", name="done")
-        button.btn Update Task
-        
-        if empty_title_error 
-            p.titleError #{ empty_title_error }
-
-        if empty_time_error
-            p.timeError #{ empty_time_error }
+        .form-group.my-3
+            label(for="title") Title
+            input.form-control#title(type="text" name="title" value= task.title)
+            if empty_title_error 
+                p.titleError.text-danger #{ empty_title_error }
+        .form-group 
+            label(for="comment") Comment
+            textarea.form-control#comment(type="text" name="comment" cols="30" rows="7")= task.comment
+        .form-group.my-3
+            label(for="time") Time
+            input.form-control#time(type="time" name="time" value= task.time)
+            if empty_time_error
+                p.timeError.text-danger #{ empty_time_error }
+        .form-group
+            label.mx-2(for="done") Done
+            input#done(type="checkbox", name="done")
+        button.btn.btn-success.my-3 Update Task
+    
+    

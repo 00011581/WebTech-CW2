@@ -63,7 +63,7 @@ app.post('/create', [
     
         for (error of errors){
             if (error.param == 'title'){
-                empty_time_error = error.msg
+                empty_title_error = error.msg
             }
             else {
                 empty_time_error = error.msg
@@ -82,7 +82,7 @@ app.post('/create', [
     }
 })
 
-
+ 
 //updating the task
 app.post('/update/:id', [
     //form validation
